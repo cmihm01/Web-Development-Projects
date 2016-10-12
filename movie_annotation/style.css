@@ -1,0 +1,16 @@
+h1 {
+	font-style: Georgia, serif;
+	text-align:center;
+}
+#movie_quotes{
+	text-align: center;
+	font-style: Georgia, serif;
+	border-style: solid;
+}
+#classic_video{
+	width:65%;
+	height:50%;
+	display: block;
+	margin: 0 auto;
+	border-style:dashed;
+}
