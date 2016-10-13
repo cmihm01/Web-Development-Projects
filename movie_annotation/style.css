@@ -5,7 +5,10 @@ h1 {
 #movie_quotes{
 	text-align: center;
 	font-style: Georgia, serif;
-	border-style: solid;
+	height:20px;
+	width:400px;
+	display:block;
+	margin:0 auto;
 }
 #classic_video{
 	width:65%;
@@ -13,4 +16,7 @@ h1 {
 	display: block;
 	margin: 0 auto;
 	border-style:dashed;
+}
+body {
+	background-color: gray;
 }
