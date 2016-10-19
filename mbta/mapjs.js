@@ -3,10 +3,12 @@ var map;
 //var me = new google.maps.LatLng(myLat, myLong);
 var myLat = 0;
 var myLong = 0;
-
+var mc = 'person.png';
 //var infowindow = new google.maps.InfoWindow();
 var marker;
- 
+ var curr_info = new google.maps.InfoWindow({
+  content: "hi"
+ })
 var alewife =  {lat:42.395428 , lng:   -71.142483};
 var davis  =  {lat:42.39674, lng: -71.121815};
 var porter = {lat: 42.3884, lng: -71.11914899999999};
@@ -44,13 +46,14 @@ function initMap() {
   });
 
   //marks each station
-  //markMap();
- 
+  markMap();
   getLoc();
 }
 function markMap(){
-   marker = 'star.png';
+  marker = 'star.png';
   stations.forEach(mark);
+  branch.forEach(mark);
+  line();
 }
 var infoWindow = new google.maps.InfoWindow({map:map});
 
@@ -61,51 +64,43 @@ if (navigator.geolocation) {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
-      console.log(pos);
+    console.log(pos);
       console.log("hi");
-
-      infoWindow.setPosition(pos);
-      infoWindow.setContent('Location found.');
       map.setCenter(pos);
+    mark_curr(pos);
     });
   } 
 }
     
 
-
-function printMap(){
-  console.log("printing");
-
-}
-
-
-
   
 
 
-  // //draws polylines
-  // flight_path = new Array;
-  // branch_fp = new Array;
-  // stations.forEach(fp);
-  // branch.forEach(bfp)
-  // branch.forEach
-  // console.log("in line");
-  //  var flightPath = new google.maps.Polyline({
-  //           path: flight_path,
-  //           geodesic: true,
-  //           strokeColor: '#FF0000',
-  //           strokeOpacity: 1.0,
-  //           strokeWeight: 2
-  //         });
-  //  var branchPath = new google.maps.Polyline({
-  //    path: branch_fp,
-  //           geodesic: true,
-  //           strokeColor: '#FF0000',
-  //           strokeOpacity: 1.0,
-  //           strokeWeight: 2
-  // });
-  // flightPath.setMap(map);
-  // branchPath.setMap(map);
+  //draws polylines
+  function line(){
+  flight_path = new Array;
+  branch_fp = new Array;
+  stations.forEach(fp);
+  branch.forEach(bfp)
+  branch.forEach
+  console.log("in line");
+   var flightPath = new google.maps.Polyline({
+            path: flight_path,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+          });
+   var branchPath = new google.maps.Polyline({
+     path: branch_fp,
+            geodesic: true,
+            strokeColor: '#FF0000',
+            strokeOpacity: 1.0,
+            strokeWeight: 2
+  });
+  flightPath.setMap(map);
+  branchPath.setMap(map);
+}
 
 
 
@@ -151,14 +146,17 @@ function mark(item, index){
 }
 
 
-// function mark_curr(cl){
-//   console.log("mc");
-//    var marker = new google.maps.Marker({
-//     position: cl,
-//     map: map,
-//     icon: mc
-//   });
-// }
+function mark_curr(cl){
+  console.log("mc");
+   var curr_mark = new google.maps.Marker({
+    position: cl,
+    map: map,
+    icon: mc
+  });
+   curr_mark.addListener('click', function(){
+    curr_info.open(map,curr_mark);
+   })
+}
 
 
 
