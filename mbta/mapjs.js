@@ -1,15 +1,15 @@
 var map;
 //var request = new XMLHttpRequest();
 //var me = new google.maps.LatLng(myLat, myLong);
-var myLat = 0;
-var myLong = 0;
+var pos;
 var mc = 'person.png';
 //var infowindow = new google.maps.InfoWindow();
 var marker;
+var closest = {d: 'NULL', stat: 'NULL'};
  var curr_info = new google.maps.InfoWindow({
   content: "hi"
  })
-var alewife =  {lat:42.395428 , lng:   -71.142483};
+var alewife =  {"alewife", {lat:42.395428 , lng:   -71.142483}};
 var davis  =  {lat:42.39674, lng: -71.121815};
 var porter = {lat: 42.3884, lng: -71.11914899999999};
 var harvard = {lat: 42.373362, lng: -71.118956};  
@@ -60,7 +60,7 @@ var infoWindow = new google.maps.InfoWindow({map:map});
 function getLoc(){
 if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = {
+      pos = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
       };
@@ -104,32 +104,6 @@ if (navigator.geolocation) {
 
 
 
-// function locate(){
-//   console.log("almost");
-//   if (!navigator.geolocation){
-//     console.log ("nope");
-//   } 
-//   else{
-//     console.log("yep");
-//   } 
-//  navigator.geolocation.getCurrentPosition(success);
-//   function success(pos){
-//     console.log("store");
-//     var crd = pos.coords;
-//     curr_loc = "lat:";
-//     curr_loc += crd.latitude;
-//     //, pos.coords.longitude};
-//     //mark_curr(curr_loc); 
-//   }
- 
-//   //console.log(readyState);
-//   console.log("after");
-
-// }
-
-
-
-
 function fp(item, index){
   flight_path.push(item);
 }
@@ -154,20 +128,47 @@ function mark_curr(cl){
     icon: mc
   });
    curr_mark.addListener('click', function(){
+    find_closest();
+    curr_info.setContent("closest:" + closest.d + "station: " + stations[closest.stat]);
     curr_info.open(map,curr_mark);
-   })
+   });
 }
 
+function find_closest(){
+  stations.forEach(calcDist);
+}
 
+function calcDist(item,index){
+  console.log('cd');
+  Number.prototype.toRad = function() {
+   return this * Math.PI / 180;
+}
 
-//function storeStations(){
- 
+var lat2 = item.lat; 
+var lon2 = item.lng; 
+var lat1 = pos.lat; 
+var lon1 = pos.lng; 
 
+var R = 6371; // km 
+//has a problem with the .toRad() method below.
+var x1 = lat2-lat1;
+var dLat = x1.toRad();  
+var x2 = lon2-lon1;
+var dLon = x2.toRad();  
+var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2);  
+var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+var d = R * c; 
 
-//   var image = 
-//   var beachMarker = new google.maps.Marker({
-//     position: {lat: -33.890, lng: 151.274},
-//     map: map,
-//     icon: image
-//   });
-// }
+if (closest.d == 'NULL'){
+  closest.d = d;
+  closest.stat = index;
+}
+if (closest.d != 'NULL' && closest.d > d){
+  closest.d = d;
+  closest.stat = index;
+}
+console.log(d);
+}
+
