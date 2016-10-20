@@ -5,11 +5,11 @@ var pos;
 var mc = 'person.png';
 //var infowindow = new google.maps.InfoWindow();
 var marker;
-var closest = {d: 'NULL', stat: 'NULL'};
+var closest = {d: '-1', stat: '0'};
  var curr_info = new google.maps.InfoWindow({
   content: "hi"
  })
-var alewife =  {"alewife", {lat:42.395428 , lng:   -71.142483}};
+var alewife =  {lat:42.395428 , lng:   -71.142483};
 var davis  =  {lat:42.39674, lng: -71.121815};
 var porter = {lat: 42.3884, lng: -71.11914899999999};
 var harvard = {lat: 42.373362, lng: -71.118956};  
@@ -38,6 +38,9 @@ south, broadway, andrew, JFK, n_quincy, wollaston, quincy_center, quincy_adams, 
 branch = [JFK,savin, fields_c, shawmut, ashmont];
 
 
+station_names  = ['Alewife', 'Davis', 'Porter', 'Harvard', 'Central', 'Kendall/MIT', 'Charles/MGH', 'Park Street', 'Downtown Crossing',
+'South', 'Broadway', 'Andrew', 'JFK', 'North Quincy', 'Wollaston', 'Quincy Center', 'Quincy Adams', 'Braintree'];
+
 function initMap() {
   //initiates map
   map = new google.maps.Map(document.getElementById('map'), {
@@ -46,6 +49,7 @@ function initMap() {
   });
 
   //marks each station
+  getJSON();
   markMap();
   getLoc();
 }
@@ -53,6 +57,7 @@ function markMap(){
   marker = 'star.png';
   stations.forEach(mark);
   branch.forEach(mark);
+  mkr.forEach(set_marker);
   line();
 }
 var infoWindow = new google.maps.InfoWindow({map:map});
@@ -65,9 +70,10 @@ if (navigator.geolocation) {
         lng: position.coords.longitude
       };
     console.log(pos);
-      console.log("hi");
-      map.setCenter(pos);
+    console.log("hi");
+    map.setCenter(pos);
     mark_curr(pos);
+    find_closest();
     });
   } 
 }
@@ -77,7 +83,7 @@ if (navigator.geolocation) {
 
 
   //draws polylines
-  function line(){
+function line(){
   flight_path = new Array;
   branch_fp = new Array;
   stations.forEach(fp);
@@ -103,16 +109,16 @@ if (navigator.geolocation) {
 }
 
 
-
 function fp(item, index){
   flight_path.push(item);
 }
 function bfp(item, index){
   branch_fp.push(item);
 }
+var mkr = new Array;
 
 function mark(item, index){
-  var mkr = new google.maps.Marker({
+  mkr[index] = new google.maps.Marker({
     position: item,
     map: map,
     icon:marker
@@ -128,47 +134,110 @@ function mark_curr(cl){
     icon: mc
   });
    curr_mark.addListener('click', function(){
-    find_closest();
-    curr_info.setContent("closest:" + closest.d + "station: " + stations[closest.stat]);
+    curr_info.setContent("<p>Closest station: " + station_names[closest.stat]+"</p>" +
+      "Distance:" + closest.d);
     curr_info.open(map,curr_mark);
+
    });
+
+}
+
+var route = new Array;
+
+function curr_line(){
+  console.log("in curr line");
+  route.push(pos);
+  route.push(stations[closest.stat]);
+  var to_stop = new google.maps.Polyline({
+    path: route,
+    geodesic: true,
+    strokeColor: '#0000FF',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+  to_stop.setMap(map);
 }
 
 function find_closest(){
   stations.forEach(calcDist);
+  console.log('curr_line');
+   curr_line();
 }
 
 function calcDist(item,index){
   console.log('cd');
   Number.prototype.toRad = function() {
    return this * Math.PI / 180;
+  }
+
+  var lat2 = item.lat; 
+  var lon2 = item.lng; 
+  var lat1 = pos.lat; 
+  var lon1 = pos.lng; 
+
+  var R = 6371; // km 
+  //has a problem with the .toRad() method below.
+  var x1 = lat2-lat1;
+  var dLat = x1.toRad();  
+  var x2 = lon2-lon1;
+  var dLon = x2.toRad();  
+  var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
+                  Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
+                  Math.sin(dLon/2) * Math.sin(dLon/2);  
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; 
+
+  if (closest.d == -1){
+    closest.d = d;
+    closest.stat = index;
+  }
+  if (closest.d != '-1' && closest.d > d){
+    closest.d = d;
+    closest.stat = index;
+  }
+  console.log(d);
 }
 
-var lat2 = item.lat; 
-var lon2 = item.lng; 
-var lat1 = pos.lat; 
-var lon1 = pos.lng; 
 
-var R = 6371; // km 
-//has a problem with the .toRad() method below.
-var x1 = lat2-lat1;
-var dLat = x1.toRad();  
-var x2 = lon2-lon1;
-var dLon = x2.toRad();  
-var a = Math.sin(dLat/2) * Math.sin(dLat/2) + 
-                Math.cos(lat1.toRad()) * Math.cos(lat2.toRad()) * 
-                Math.sin(dLon/2) * Math.sin(dLon/2);  
-var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-var d = R * c; 
+// Step 1: create an instance of XMLHttpRequest
+request = new XMLHttpRequest();
+// Step 2: Make request to remote resource
+// NOTE: https://messagehub.herokuapp.com has cross-origin resource sharing enabled
+function getJSON(){
+  request.open("GET", 'https://rocky-taiga-26352.herokuapp.com/redline.json', true);
+  // Step 3: Create handler function to do something with data in response
+  
+  request.onreadystatechange = function(){
+     if (request.readyState == 4 && request.status == 200) {
+    console.log("in rs");
+   // Step 5A: get the response text
+    theData = request.responseText;
+    console.log("the data:" + theData);
+   // Step 5B: parse the text into JSON
+    schedule = JSON.parse(theData);
+  }
 
-if (closest.d == 'NULL'){
-  closest.d = d;
-  closest.stat = index;
+    else if(request.readyState == 4 && request.status != 200) {
+          console.log("Not good");
+    }
+
+    else {
+          console.log("In progress...");
+    }
+  }
+  request.send();
+  
 }
-if (closest.d != 'NULL' && closest.d > d){
-  closest.d = d;
-  closest.stat = index;
+
+function set_marker(item,index){
+  console.log("in set_marker");
+  item.addListener('click', function(){
+    curr_info.setContent("<p>Closest station: <p>");
+    curr_info.open(map,item);
+
+   });
+
 }
-console.log(d);
-}
+
+
 
