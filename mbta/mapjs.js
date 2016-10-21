@@ -40,7 +40,7 @@ south, broadway, andrew, JFK, n_quincy, wollaston, quincy_center, quincy_adams, 
 
 //parallel array to access names of stations
 station_names  = ['Alewife', 'Davis', 'Porter Square', 'Harvard Square', 'Central Square', 'Kendall/MIT', 'Charles/MGH', 'Park Street', 'Downtown Crossing',
-'South Station', 'Broadway', 'Andrew', 'JFK', 'North Quincy', 'Wollaston', 'Quincy Center', 'Quincy Adams', 'Braintree', 'Savin Hill', 'Fields Corner', 'Shawmut', 'Ashmont'];
+'South Station', 'Broadway', 'Andrew', 'JFK/UMass', 'North Quincy', 'Wollaston', 'Quincy Center', 'Quincy Adams', 'Braintree', 'Savin Hill', 'Fields Corner', 'Shawmut', 'Ashmont'];
 
 //initMap() is called when page is loaded, loads map and calls helper functions
 //to set up markers & data
@@ -48,7 +48,7 @@ function initMap() {
   //initiates map
   map = new google.maps.Map(document.getElementById('map'), {
     center: {lat: 42.352271, lng: -71.05524200000001},
-    zoom: 10
+    zoom: 12
   });
 
   //loads train info 
