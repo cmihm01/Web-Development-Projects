@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<title>Captain's Log</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script>
+	//onload
+	$(document).ready(function(){
+		//restore the log 
+		load(); 
+		//on enter, read input and add to log
+  		$( "#msg" ).keypress(function(e) {
+	  		var code = e.keyCode || e.which;
+ 			if(code == 13) { 
+ 				day = new Date();
+ 				logtxt = "<p>" + day + " - " + $(this).val() + "</p>";
+ 				$('#log').prepend(logtxt);
+ 				store(day, logtxt);
+ 				//clear input field
+ 				document.getElementById('msg').value = "";
+ 				
+ 			}
+		});
+ 	 });
+
+	//fills log with previous entries from local storage
+	function load(){
+		for (key in localStorage) {
+			console.log(localStorage[key]);
+			$('#log').prepend(localStorage[key]);
+		}
+	}
+	//stores just entered value in local storage 
+	function store(time, val) {
+		localStorage.setItem(time, val);
+	}
+	
+	</script>
+</head>
+
+<body>
+	<h1>Captain's Log</h1>
+	<h3>New entry: <input type="text" id="msg" name="msg" size="30" /></h3>
+	<div id="log"></div>
+</body>
+</html>
