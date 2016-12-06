@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<style>
+	img{
+		border: 1px solid;
+	}
+	h1{
+		text-align:center;
+	}
+	</style>
+</head>
+<body>
+<h1> Comp20 Assignment 4 </h1>
+<p><b>Introduction:</b> The job I was given was to test the security of a web server. It has three main functions. First, is to stores users’ scores from the game 2048. Second, it shows all scores from the game for all users, sorted by highest to lowest. Finally, it displays only scores of a specific username, given by the user. </p>
+
+<p><b>Methodology</b>: I used cross-site scripting, as well as various different types of insertion into the database, in an attempt to test the various security and privacy violations that may exist. All of these involved using curl to make post requests to the website. I then accessed the information by using the heroku url. </p>
+
+<p><b>Abstract of Findings</b>: I found several violations in this program. First, data can be inserted into the database without having played the game. Thus, in any of the fields, the data can be forged. This can result in faulty information, with someone forging a high score or a winning grid. This can also lead to insertion of random information, such as an inappropriate string, into any of the categories. Additionally, you can access any data from the database without any credentials. Additionally, I attempted to perform several cross-site scripting attacks, but my partner actually had code defending against it. </p>
+<p><b>Issues Found:</b></p> 
+<ol>
+<li> Faulty Scores can be submitted to the /submit.json page.</li>
+	<ul>
+		<li>Severity: Medium</li>
+		<li> Description of Issue: I used curl to attempt a post request to the database.</li>
+		<img src=fig2.png>
+		<li>This resulted in this data being added:</li>
+		<img src = fig1.png>
+		<li>This is a vulnerability because the validity of the data is totally destroyed. If anyone can submit data, without having it be validated by the game in any way, then there is no real way to keep track of high scores. </li>
+		<li>Resolution: Scores should only be accepted from the game website. When handling a request, you can test where it is coming from, and thus weed out whether or not the data should be accepted. </li>
+	</ul>
+<li> Anything can be inserted into query fields </li>
+	<ul>
+		<li>Location: /submit.json</li>
+		<li>Severity of issue: Medium</li>
+		<li>Similarly to the last one, this was found using a curl request.</li>
+		<img src=fig3.png>
+		<li> Even though a score should always be an integer value, the field will accept and print any input. This means that someone could theoretically insert inappropriate or offensive information into the webpage. My message was pretty tame, but anything inserted will be printed.</li>
+		<img src = fig4.png>
+		<li>This opens up the site to being vulnerable to displaying all sorts of data and information, which is not secure or good for potential image. </li>
+		<li>Resolution: Fields should be screened for whether they are of the right type. For instance, the score field should only accept number inputs. </li>
+	</ul>
+<li>Attempted Cross-Site Scripting</li>
+	<ul>
+		<li>I attempted to do XSS, which means inserting code into a web page by inserting script or html tags which would trigger actions, such as an alert. I, once again, did this through curl. </li>
+		<img src = fig6.png>
+		<li> While my code was accepted, it removed all < and > symbols, making my attempted attacks useless. They were just treated as strings, and implanted into the database.</li>
+		<img src = fig7.png>
+ 		<li>Resolution: Well, this issue is actually already resolved. But, the way to resolve it is to check for special characters and remove them, as his code does. It searches for any characters which might be attempting to insert tags, like I tried to do, and removes the tags, leaving only strings. </li>
+ 		<img src = fig5.png>
+	</ul>
+</ol>
+
+<p><b>Conclusion:</b> Overall, because this website doesn’t have a lot of private information stored, the security threats are not that severe. However, it does contain a lot of practices which, when used with more sensitive data, offer much more severe threats. The ability to access all data, for one, can be extremely dangerous if passwords or private information is stored. Additionally, not screening user content before posting it can lead to inappropriate materials and XSS. </p>
+
+</body>
+</html>

@@ -219,7 +219,7 @@ function getJSON(){
   //creates XMLHTTP reqeuest
   request = new XMLHttpRequest();
 
-  request.open("GET", 'https://rocky-taiga-26352.herokuapp.com/redline.json', true);
+  request.open("GET", 'https://limitless-spire-53240.herokuapp.com/redline.json', true);
   // Step 3: Create handler function to do something with data in response
   
   request.onreadystatechange = function(){
